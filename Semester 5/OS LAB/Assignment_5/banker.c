@@ -8,9 +8,11 @@ int safeSequence[100];
 
 void isSystemSafe(int numProcesses, int numResources) {
     int i, j, work[100], count = 0;
+    //copy all available resources in work matrix
     for (i = 0; i < numResources; i++)
         work[i] = availableResources[i];
 
+    //Initialize the ProcessFinished array
     for (i = 0; i < 100; i++)
         isProcessFinished[i] = false;
 
@@ -49,8 +51,15 @@ void isSystemSafe(int numProcesses, int numResources) {
     printf("\n");
 }
 
+void needMatrix(int numProcesses, int numResources){
+    for (int i = 0; i < numProcesses; i++)
+        for (int j = 0; j < numResources; j++)
+            remaining_need[i][j] = maximumDemands[i][j] - allocation[i][j];
+}
+
 int main() {
     int i, j, numProcesses, numResources;
+    int processIndex, resourceRequest[100];
     printf("Enter the number of processes and resources: ");
     scanf("%d %d", &numProcesses, &numResources);
 
@@ -70,34 +79,57 @@ int main() {
             scanf("%d", &maximumDemands[i][j]);
 
     // Calculation of the remaining_need matrix
-    for (i = 0; i < numProcesses; i++)
-        for (j = 0; j < numResources; j++)
-            remaining_need[i][j] = maximumDemands[i][j] - allocation[i][j];
+    needMatrix(numProcesses, numResources);
 
-    isSystemSafe(numProcesses, numResources);
+    while(1){
+        printf("1) Calculate Need Matrix\n");
+        printf("2) Check safety\n");
+        printf("3) Request Resource\n");
+        printf("4) Exit\n");
+        printf("Enter your choice:");
+        int choice;
+        scanf("%d",&choice);
 
-    int processIndex, resourceRequest[100];
-    printf("Enter the process number for resource request: ");
-    scanf("%d", &processIndex);
-
-    printf("Enter the requested instances of Each: ");
-    for (i = 0; i < numResources; i++)
-        scanf("%d", &resourceRequest[i]);
-
-    for (i = 0; i < numResources; i++) {
-        if (remaining_need[processIndex][i] < resourceRequest[i] || resourceRequest[i] > availableResources[i]) {
-            printf("Cannot request\n");
+        if(choice == 4){
+            printf("\nExited from program...\n");
             break;
         }
-    }
 
-    if (i == numResources) {
-        for (i = 0; i < numResources; i++) {
-            allocation[processIndex][i] += resourceRequest[i];
-            availableResources[i] -= resourceRequest[i];
-            remaining_need[processIndex][i] -= resourceRequest[i];
+        switch (choice){
+        case 1:
+            needMatrix(numProcesses, numResources);
+            break;
+        case 2:
+            isSystemSafe(numProcesses, numResources);
+            break;
+        case 3:
+            printf("Enter the process number for resource request: ");
+            scanf("%d", &processIndex);
+
+            printf("Enter the requested instances of Each: ");
+            for (i = 0; i < numResources; i++)
+                scanf("%d", &resourceRequest[i]);
+
+            for (i = 0; i < numResources; i++) {
+                if (remaining_need[processIndex][i] < resourceRequest[i] || resourceRequest[i] > availableResources[i]) {
+                    printf("Cannot request\n");
+                    break;
+                }
+            }
+
+            if (i == numResources) {
+                for (i = 0; i < numResources; i++) {
+                    allocation[processIndex][i] += resourceRequest[i];
+                    availableResources[i] -= resourceRequest[i];
+                    remaining_need[processIndex][i] -= resourceRequest[i];
+                }
+                isSystemSafe(numProcesses, numResources);
+            }
+            break;
+        default:
+            printf("\nInValid Choice, Try again...");
+            break;
         }
-        isSystemSafe(numProcesses, numResources);
     }
     return 0;
 }
