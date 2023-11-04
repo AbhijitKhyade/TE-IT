@@ -2,7 +2,7 @@
 
 ADDRESS_BOOK="address_book.txt"
 
-# Function to create a new address book file
+# Function to create a new address book 
 create_address_book() {
   if [ -f "$ADDRESS_BOOK" ]; then
     read -p "Address book file already exists. Do you want to overwrite it? (y/n): " choice
@@ -18,6 +18,7 @@ create_address_book() {
   fi
 }
 
+# Function to display an address book 
 display_record() {
     if [ -s "$ADDRESS_BOOK" ]; then
         # Use awk to format the data into columns
@@ -29,6 +30,7 @@ display_record() {
     fi
 }
 
+# Function to insert records to address book 
 insert_record() {
     read -p "Enter the name: " name
     read -p "Enter the address: " address
@@ -65,6 +67,7 @@ delete_record() {
     fi
 }
 
+# Function to modify an address book 
 modify_record() {
     echo "Enter the name to modify:"
     read name
