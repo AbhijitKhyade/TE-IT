@@ -1,107 +1,87 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <semaphore.h>
 #include <pthread.h>
-#include<unistd.h>
+#include <semaphore.h>
+#include <unistd.h>
 
-sem_t mutex;          // To protect the shared resources
-sem_t writeSemaphore; // semaphore for writer
-int readerNum = 0;    // number of current readers
+void *writer_thr(void *temp);
+void *reader_thr(void *temp);
+sem_t mutex;
+sem_t writeSemaphore;
+int readcount = 0, w, r;
 
-void *reader(void *arg)
-{
-    while (1)
-    {
-        // Reader wants to enter the critical section
-        sem_wait(&mutex);
-        readerNum++;
-        if (readerNum == 1)
-        {
-            sem_wait(&writeSemaphore); // first reader blocks writer
-        }
-        sem_post(&mutex);
+void *writer_thr(void *temp) {
+    int *id_ptr = (int *)temp;
+    int id = *id_ptr;
+    free(id_ptr);
 
-        // Reading the shared resource
-        printf("Reader %ld is reading ...\n", (long)arg);
-        // Simulate reading by sleeping for a random time
-        usleep(rand() % 1000000);
-
-        // Reader is living the critical section
-        sem_wait(&mutex);
-        readerNum--;
-        if (readerNum == 0)
-        {
-            sem_post(&writeSemaphore); // Last reader unblocks the reader
-        }
-        sem_post(&mutex);
-
-        // Perform some other non-critical work
-        usleep(rand() % 1000000);
-    }
+    printf("\nWriter %d is trying to enter the database for modifying data.", id);
+    sem_wait(&writeSemaphore);
+    printf("\nWriter %d is writing in the database.", id);
+    sleep(3);
+    printf("\nWriter %d is leaving the database.\n", id);
+    sem_post(&writeSemaphore);
+    pthread_exit(NULL);
 }
 
-void *writer(void *arg)
-{
-    while (1)
-    {
-        // Writer wants to enter the critical section
+void *reader_thr(void *temp) {
+    int *id_ptr = (int *)temp;
+    int id = *id_ptr;
+    free(id_ptr);
+
+    printf("\nReader %d is trying to enter the database for reading.", id);
+    sem_wait(&mutex);
+    readcount++;
+    if (readcount == 1)
         sem_wait(&writeSemaphore);
+    sem_post(&mutex);
 
-        // Writing to the shared resource
-        printf("Writer %ld is writing...\n", (long)arg);
+    printf("\nReader %d is now reading in the database.", id);
 
-        // Simulate writing by sleeping for a random time
-        usleep(rand() % 1000000);
-
-        // Writer is leaving the critical section
+    sem_wait(&mutex);
+    readcount--;
+    if (readcount == 0)
         sem_post(&writeSemaphore);
+    sem_post(&mutex);
 
-        // Perform some other non-critical work
-        usleep(rand() % 1000000);
-    }
+    printf("\nReader %d has left the database.\n", id);
+    sleep(3);
+    pthread_exit(NULL);
 }
 
-int main()
-{
-    int readers_no, writers_no;
-    printf("\nEnter the number of readers: ");
-    scanf("%d", &readers_no);
-
-    printf("\nEnter the number of writers: ");
-    scanf("%d", &writers_no);
-
-    pthread_t readers[readers_no];
-    pthread_t writers[writers_no];
-
-    // Initialize Semaphores
+int main() {
+    long int i;
     sem_init(&mutex, 0, 1);
     sem_init(&writeSemaphore, 0, 1);
+    pthread_t reader[100], writer[100];
 
-    // Create Reader threads
-    for (long i = 0; i < readers_no; i++)
-    {
-        pthread_create(&readers[i], NULL, reader, (void *)i);
+    printf("\nEnter number of readers: ");
+    scanf("%d", &r);
+    printf("\nEnter number of writers: ");
+    scanf("%d", &w);
+
+    for (i = 1; i <= w; i++) {
+        int *writer_id = malloc(sizeof(int));
+        *writer_id = i;
+        pthread_create(&writer[i], NULL, writer_thr, (void *)writer_id);
     }
 
-    // Create Writer threads
-    for (long i = 0; i < writers_no; i++)
-    {
-        pthread_create(&writers[i], NULL, writer, (void *)i);
+    for (i = 1; i <= r; i++) {
+        int *reader_id = malloc(sizeof(int));
+        *reader_id = i;
+        pthread_create(&reader[i], NULL, reader_thr, (void *)reader_id);
     }
 
-    // Join threads
-    for (int i = 0; i < readers_no; i++)
-    {
-        pthread_join(readers[i], NULL);
-    }
-    for (int i = 0; i < writers_no; i++)
-    {
-        pthread_join(writers[i], NULL);
+    for (i = 1; i <= w; i++) {
+        pthread_join(writer[i], NULL);
     }
 
-    // clean up the semaphores
-    sem_destroy(&mutex);
+    for (i = 1; i <= r; i++) {
+        pthread_join(reader[i], NULL);
+    }
+
     sem_destroy(&writeSemaphore);
+    sem_destroy(&mutex);
 
-    return 0;
+    pthread_exit(NULL); // Exit the main thread gracefully
 }
