@@ -3,11 +3,10 @@
 #include <unistd.h>
 #include <sys/shm.h>
 #include <string.h>
-int main()
-{
-    int i;
+int main(){
+    // int i;
+    // char buff[100];
     void *shared_memory;
-    char buff[100];
     int shmid;
     shmid = shmget((key_t)2345, 1024, 0666);
     printf("Key of shared memory is %d\n", shmid);

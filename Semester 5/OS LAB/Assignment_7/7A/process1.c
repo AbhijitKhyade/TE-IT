@@ -5,19 +5,16 @@
 #include <unistd.h>
 #include <fcntl.h>
 #define BUFFER_SIZE 1024
-int main()
-{
+int main(){
     int fd1, fd2, num;
     char buffer[BUFFER_SIZE];
     // Create the first pipe
-    if (mkfifo("pipe1", 0666) < 0)
-    {
+    if (mkfifo("pipe1", 0666) < 0){
         perror("mkfifo");
         exit(1);
     }
     // Create the second pipe
-    if (mkfifo("pipe2", 0666) < 0)
-    {
+    if (mkfifo("pipe2", 0666) < 0){
         perror("mkfifo");
         exit(1);
     }
@@ -31,9 +28,9 @@ int main()
     // Write input to the first pipe
     write(fd1, buffer, strlen(buffer) + 1);
     // Read output from the second pipe
-    num = read(fd2, buffer, BUFFER_SIZE);
-    // Display output to user
-    printf("Output: %s\n", buffer);
+	while ((num = read(fd2, buffer, BUFFER_SIZE)) > 0){
+		write(STDOUT_FILENO, buffer, num); // Display to the console
+	}
     // Close the pipes
     close(fd1);
     close(fd2);
