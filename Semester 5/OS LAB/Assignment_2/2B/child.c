@@ -1,29 +1,34 @@
-#include <stdio.h>
+#include<stdio.h>
+
 int main(int argc, char *argv[]){
-    int a[10], i, m, c = 0, l, u, mid;
-    printf("\n\nEnter the number to be searched  :  ");
-    scanf("%d", &m);
-    for (i = 0; i < argc; i++){
-        a[i] = atoi(argv[i]);
+    int arr[10];
+    printf("\n");
+    printf("\t\t\tEntered in new child program :)");
+    printf("\n");
+    //convert string to integer
+    for(int i=0;i<argc;i++){
+        arr[i] = atoi(argv[i]);
     }
-    l = 0, u = i - 1;
-    while (l <= u){
-        mid = (l + u) / 2;
-        if (m == a[mid]){
-            c = 1;
-            break;
+    printf("\nEnter no to search: ");
+    int val;
+    scanf("%d", &val);
+
+    int low =0, high=argc-1;
+    while(low<=high){
+        int mid = (low+high)/2;
+        if(arr[mid] == val){
+            printf("\nThe value found in array :)\n");
+            return;
         }
-        else if (m < a[mid]){
-            u = mid - 1;
+        else if(val < arr[mid]){
+            high = mid-1;
         }
         else{
-            l = mid + 1;
+            low = mid+1;
         }
     }
-    if (c == 0)
-        printf("\n\nThe number is not found.");
-    else
-        printf("\n\nThe number is found.");
-
+    if(low > high){
+        printf("\nThe value not found in array :(\n");
+    }
     return 0;
 }

@@ -3,7 +3,6 @@
 #include<sys/types.h>
 #include<unistd.h>
 
-
 int main(){
 
     pid_t p;
@@ -20,6 +19,7 @@ int main(){
         printf("\nMy process ID: %d", getpid());
         printf("\nMy child process ID: %d", p);
         system("ps");
+        // wait(NULL); //for zombie
     }
     return 0;
 }

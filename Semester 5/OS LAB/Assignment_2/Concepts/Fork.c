@@ -12,7 +12,7 @@ int main(){
     }
     else{
         printf("\nI am parent process");
-        printf("\nMy process ID: %d",getppid());
+        printf("\nMy process ID: %d",getpid());
     }
     return 0;
 }

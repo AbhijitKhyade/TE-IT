@@ -5,11 +5,15 @@ struct process{
 };
 
 void print_table(vector<process> &p){
-    int n  = p.size();
-    cout<<"Process\tAT\tBT\tCT\tTAT\tWT\n";
-    for(int i= 0; i < n; i++){
+    cout<<"\n";
+    int n = p.size();
+    cout<<"--------------------------------------------"<<"\n";
+    cout<<"Process"<<"\t"<<"A.T."<<"\t"<<"B.T."<<"\t"<<"C.T."<<"\t"<<"T.A.T."<<"\t"<<"W.T."<<"\n";
+    cout<<"--------------------------------------------"<<"\n";
+    for(int i=0;i<n;i++){
         cout<<p[i].id<<"\t"<<p[i].at<<"\t"<<p[i].bt<<"\t"<<p[i].ct<<"\t"<<p[i].tat<<"\t"<<p[i].wt<<"\n";
-    } 
+        cout<<"--------------------------------------------"<<"\n";
+    }
 }
 
 void sort_process_by_at(vector<process> &p){

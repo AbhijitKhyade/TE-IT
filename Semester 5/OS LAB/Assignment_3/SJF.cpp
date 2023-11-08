@@ -5,10 +5,14 @@ struct process{
 };
 
 void print_table(vector<process> &p){
+    cout<<"\n";
     int n = p.size();
-    cout << "Process\tAT\tBT\tCT\tTAT\tWT\n";
-    for (int i = 0; i < n; i++){
-        cout << p[i].id << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].ct << "\t" << p[i].tat << "\t" << p[i].wt << "\n";
+    cout<<"--------------------------------------------"<<"\n";
+    cout<<"Process"<<"\t"<<"A.T."<<"\t"<<"B.T."<<"\t"<<"C.T."<<"\t"<<"T.A.T."<<"\t"<<"W.T."<<"\n";
+    cout<<"--------------------------------------------"<<"\n";
+    for(int i=0;i<n;i++){
+        cout<<p[i].id<<"\t"<<p[i].at<<"\t"<<p[i].bt<<"\t"<<p[i].ct<<"\t"<<p[i].tat<<"\t"<<p[i].wt<<"\n";
+        cout<<"--------------------------------------------"<<"\n";
     }
 }
 
@@ -41,7 +45,7 @@ void sort_process_by_ct(vector<process> &p){
 int find_shortest_job(vector<process> p, int current_time){
     int n = p.size();
     int sj_index = -1;
-    int sj = 99999;
+    int sj = 99999999;
     for (int i = 0; i < n; i++){
         if (p[i].at <= current_time && p[i].rt > 0 && p[i].rt < sj){
             sj_index = i;
@@ -55,8 +59,8 @@ void print_gantt_chart(vector<process> p){
 
     cout << "Gantt Chart: \n";
     int n = p.size();
+    
     int index = 0;
-
     for (int i = 0; i <= p[n - 1].ct && index < n; i++){
         if (i == p[index].ct){
             cout << "-+-";
@@ -121,7 +125,7 @@ int main(){
 
     vector<process> p(n);
 
-   for (int i = 0; i < n; i++){
+    for (int i = 0; i < n; i++){
         cout << "Process ID : " << (i + 1) << endl;
         p[i].id = (i + 1);
         cout << "\t\tArrival time :: ";
@@ -168,11 +172,9 @@ int main(){
     print_table(p);
     cout << endl;
     sort_process_by_ct(p);
-    // print_table(p);
     print_gantt_chart(p);
 
     cout << "Average TAT :: " << avgTat << endl;
     cout << "Average WT :: " << avgWt << endl;
-
     return 0;
 }

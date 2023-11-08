@@ -1,57 +1,71 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/wait.h>
 
-void bubble(int array[15], int n){
-    int d, swap, c;
-    for (c = 0; c < (n - 1); c++){
-        for (d = 0; d < n - c - 1; d++){
-            if (array[d] > array[d + 1]){
-                swap = array[d];
-                array[d] = array[d + 1];
-                array[d + 1] = swap;
+void bubbleSort(int arr[], int n){
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n-1-i;j++){
+            if(arr[j] > arr[j+1]){
+                int temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
             }
         }
     }
 }
 
+void print_array(int arr[], int n){
+    printf("\n");
+    for(int i=0;i<n;i++){
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
 int main(){
-    int i, a[15], n, key;
-    char *arg[10], str[15], *str2;
-    pid_t parent_id, child_id, id;
-    printf("\n Enter the size of the input array : ");
+    int n;
+    printf("Enter the size of array: ");
     scanf("%d", &n);
-    printf("\n Enter the elements of the input array : ");
-    for (i = 0; i < n; i++){
-        scanf("%d", &a[i]);
+
+    int arr[n];
+    printf("Enter array elements: ");
+    for(int i=0;i<n;i++){
+        scanf("%d", &arr[i]);
     }
-    parent_id = getpid();
-    printf("\n\nIn parent id->%d\n", parent_id);
-    printf("\n\nSorting Numbers\n");
-    bubble(a, n);
+
+    pid_t id;
     id = fork();
-    if (id == 0){
-        child_id = getpid();
-        printf("\n\nIn child id->%d\n", child_id);
-        printf("\n\nThe Sorted Numbers are : ");
-        for (i = 0; i < n; i++){
-            sprintf(str, "%d", a[i]);
+    if(id == 0){
+        printf("\nIn Child Process...");
+        printf("\nMy Process ID: %d",getpid());
+        printf("\nMy parent Process ID: %d",getppid());
+        bubbleSort(arr,n);
+        printf("\nArray Sorted in child.");
+        print_array(arr,n);
+        char *arg[10], str[15];
+        int i;
+        for(i=0;i<n;i++){
+            sprintf(str,"%d",arr[i]);
             arg[i] = malloc(sizeof(str));
-            strcpy(arg[i], str);
+            strcpy(arg[i],str);
         }
-        arg[i] = NULL;
-        printf("\n\nExecuting execve Statement\n");
-        execve("./2b2", arg, NULL);
-        printf("\n\nexecve Completed\n");
-        printf("\n\nChild Complete.   Now Child Exits\n\n");
+        arg[i] = NULL; //Null terminator for string
+        printf("\nExecuting execve Statement\n");
+        execve("./child", arg, NULL);
+
     }
-    else if (id > 0){
-        printf("\n\nIn Parent\n\nNow Waiting\n\n");
-        wait();
-        printf("\n\nParent Complete.   Now Parents Exits\n\n");
+    else if(id > 0){
+        printf("\nIn Parent Process...");
+        printf("\nMy Process ID: %d",getpid());
+        printf("\nMy Child Process ID: %d",id);
+        printf("\nParent is waiting to complete the child ...");
+        printf("\n");
+        wait(NULL);
+        printf("\nChild execution Completed :)\n");
+    }
+    else{
+        printf("\nChild not created.");
     }
     return 0;
 }

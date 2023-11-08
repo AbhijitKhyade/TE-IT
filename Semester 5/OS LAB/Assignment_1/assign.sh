@@ -10,10 +10,10 @@ create_address_book() {
       >"$ADDRESS_BOOK"
       echo "Creating a new address book..."
     else
-      echo -e "\nKeeping the existing address book."
+      echo "Keeping the existing address book."
     fi
   else
-    echo -e "\nCreating a new address book..."
+    echo "Creating a new address book..."
     touch "$ADDRESS_BOOK"
   fi
 }
@@ -22,7 +22,7 @@ create_address_book() {
 display_record() {
     if [ -s "$ADDRESS_BOOK" ]; then
         # Use awk to format the data into columns
-        awk -F: 'BEGIN { printf "%-20s %-20s %-20s %-20s \n", "Name", "Address", "Roll No.", "Phone Number";
+        awk -F: 'BEGIN { printf "%-20s %-20s %-20s %-20s \n", "HouseNo", "Name", "Address", "Phone Number";
         printf "---------------------------------------------------------------------------------------\n" }
         { printf "%-20s %-20s %-20s %-20s \n", $1, $2, $3, $4 }' "$ADDRESS_BOOK"
     else
@@ -34,11 +34,11 @@ display_record() {
 insert_record() {
     read -p "Enter the name: " name
     read -p "Enter the address: " address
-    read -p "Enter the Roll no: " roll
+    read -p "Enter the house no: " house
 
     # Validate phone number input
     while true; do
-        read -p "Enter the Phn number (10 digits only): " phn
+        read -p "Enter the Phone number (10 digits only): " phn
         if [[ ! $phn =~ ^[0-9]{10}$ ]]; then
             echo "Invalid phone number format. Please enter a 10-digit phone number."
         else
@@ -46,21 +46,20 @@ insert_record() {
         fi
     done
 
-    echo "$name:$address:$roll:$phn" >> "$ADDRESS_BOOK"
+    echo "$house:$name:$address:$phn" >> "$ADDRESS_BOOK"
     echo "Record inserted successfully."
 }
 
 # Function to delete a record from the address book
 delete_record() {
-    read -p "Enter name to delete: " name
-
+    read -p "Enter house No to delete: " house
     # Use grep to check if the name exists in the address book file
-    if grep -q "^$name:" "$ADDRESS_BOOK"; then
+    if grep -q "^$house:" "$ADDRESS_BOOK"; then
         # If the name exists, delete the record and create a temporary file
-        grep -v -i "^$name:" "$ADDRESS_BOOK" > temp.txt
+        grep -v -i "^$house:" "$ADDRESS_BOOK" > temp.txt
         # Move the temporary file to the original address book file
         mv temp.txt "$ADDRESS_BOOK"
-        echo "Record of $name deleted successfully."
+        echo "Record of $house deleted successfully."
     else
         # If the name doesn't exist, show the record not found message
         echo "Record not found."
@@ -69,49 +68,46 @@ delete_record() {
 
 # Function to modify an address book 
 modify_record() {
-    echo "Enter the name to modify:"
-    read name
+    echo "Enter the house no to modify:"
+    read house
 
-    if grep -q "^$name:" "$ADDRESS_BOOK"; then
-    while true; do
-    echo "Options:"
-    echo "1) Modify address? "
-    echo "2) Modify Roll No.? "
-    echo "3) Modify Phone?"
-    echo "4) Modify Name?"
-    echo "5) Done with Modifying?"
-    echo "Enter your choice:"
-    read choice
+    if grep -q "^$house:" "$ADDRESS_BOOK"; then
+        while true; do
+            echo "Options:"
+            echo "1) Modify address? "
+            echo "2) Modify Phone?"
+            echo "3) Modify Name?"
+            echo "4) Done with Modifying?"
+            echo "Enter your choice:"
+            read choice
 
-    case "$choice" in
-        1) echo "Enter the new address:"
-        read new_address
-   # sed is stream editor which replace new value over existing value
-        sed -i "s/^$name:.*/$name:$new_address:$roll:$phn/" "$ADDRESS_BOOK"
-        echo "Record modified successfully." ;;
-        2)    echo "Enter the new RollNo:"
-        read new_roll
-   # sed is stream editor which replace new value over existing value
-        sed -i "s/^$name:.*/$name:$address:$new_roll:$phn/" "$ADDRESS_BOOK"
-        echo "Record modified successfully.";;
-        3)     echo "Enter the new Phone Number:"
-        read new_phn
-   # sed is stream editor which replace new value over existing value
-        sed -i "s/^$name:.*/$name:$address:$roll:$new_phn/" "$ADDRESS_BOOK"
-        echo "Record modified successfully.";;
-        4)     echo "Enter the new Name:"
-        read new_name
-   # sed is stream editor which replace new value over existing value
-        sed -i "s/^$name:.*/$new_name:$address:$roll:$phn/" "$ADDRESS_BOOK"
-        echo "Record modified successfully.";;
-        5)  break ;;
-        *) echo "Invalid choice. Please try again." ;;
-    esac
-done
-     
+            case "$choice" in
+                1)  echo "Enter the new address:"
+                    read new_address
+                    # Update the address variable
+                    address="$new_address"
+                    sed -i "s/^$house:.*/$house:$name:$address:$phn/" "$ADDRESS_BOOK"
+                    echo "Record modified successfully." ;;
+                2)  echo "Enter the new Phone Number:"
+                    read new_phn
+                    # Update the phn variable
+                    phn="$new_phn"
+                    sed -i "s/^$house:.*/$house:$name:$address:$phn/" "$ADDRESS_BOOK"
+                    echo "Record modified successfully.";;
+                3)  echo "Enter the new Name:"
+                    read new_name
+                    # Update the name variable
+                    name="$new_name"
+                    sed -i "s/^$house:.*/$house:$name:$address:$phn/" "$ADDRESS_BOOK"
+                    echo "Record modified successfully.";;
+                4) break ;;
+                *) echo "Invalid choice. Please try again." ;;
+            esac
+        done
     else
-        echo "Record not found."
+        echo "House no not found in the address book."
     fi
+
 }
 
 while true; do
