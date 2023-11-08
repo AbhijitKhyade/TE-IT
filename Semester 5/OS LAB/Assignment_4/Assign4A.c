@@ -1,98 +1,123 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <unistd.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<semaphore.h>
+#include<pthread.h>
+
 #define BUFFER_SIZE 10
 
 int buffer[BUFFER_SIZE];
-int count = 0, NUM_CONSUMERS, NUM_PRODUCERS;
-sem_t empty, full;
-pthread_mutex_t mutex;
+int count=0,numProducers, numConsumers;
+sem_t empty, full, mutex;
 
-void *producer(void *arg) {
+void *producer(void *arg){
     int producer_id = *((int *)arg);
     int item;
-    while (1) {
-        item = rand() % 100;
+    while(1){
+        int item = rand() % 100;
 
-        if (count == BUFFER_SIZE) {
-            printf("\t\t\t\t\t\t\t\t\t\t\tBUFFER FULL\n");
+        if(count == BUFFER_SIZE){
+            printf("\n\nBUFFER is FULL...");
             sleep(1);
         }
-		sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
+
+        sem_wait(&empty);
+        sem_wait(&mutex);
 
         buffer[count++] = item;
-        printf("\t\t\t\tProducer %d produced Item Number: I0%d\n", producer_id, item);
-        printf("\t\t\t\tBuffer Size: %d\n", count);
+        printf("\n\nProducer %d produced an item %d", producer_id, item);
+        
+        printf("\nBuffer Size: %d", count);
 
-        pthread_mutex_unlock(&mutex);
+        //print buffer
+        printf("\nBuffer: ");
+        for(int i=0;i<count;i++){
+            printf("%d ", buffer[i]);
+        }
+        printf("\n");
+
+        sem_post(&mutex);
         sem_post(&full);
         sleep(1);
     }
     pthread_exit(NULL);
 }
 
-void *consumer(void *arg) {
+void *consumer(void *arg){
     int consumer_id = *((int *)arg);
     int item;
-    while (1) {
-		
-        if (count == 0) {
-            printf("\t\t\t\t\t\t\t\t\t\t\tBUFFER EMPTY\n");
+    while(1){
+        int item = rand() % 100;
+
+        if(count == 0){
+            printf("\n\nBUFFER is EMPTY...");
             sleep(2);
         }
+
         sem_wait(&full);
-        pthread_mutex_lock(&mutex);
+        sem_wait(&mutex);
 
-        item = buffer[--count];
-        printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\tConsumer %d consumed Item Number: I0%d\n", consumer_id, item);
-        printf("\t\t\t\t\t\t\t\t\t\t\t\t\t\tBuffer Size: %d\n", count);
+        item = buffer[--count]; 
+        printf("\n\nConsumer %d consumed an item %d", consumer_id, item);
+        printf("\nBuffer Size: %d", count);
 
-        pthread_mutex_unlock(&mutex);
+        //print buffer
+        printf("\nBuffer: ");
+        for(int i=0;i<count;i++){
+            printf("%d ", buffer[i]);
+        }
+        printf("\n");
+
+        sem_post(&mutex);
         sem_post(&empty);
         sleep(2);
     }
     pthread_exit(NULL);
 }
 
-int main() {
-    printf("\t\t\t\t\t\t\t\t\t\tProducer Consumer Problem\n\n");
-    printf("\t\t\t\tEnter Consumer and Producer count[P C]: ");
-	scanf("%d %d",&NUM_PRODUCERS, &NUM_CONSUMERS);
+int main(){
+    printf("Enter the no of producers and consumers: ");
+    scanf("%d %d",&numProducers, &numConsumers);
 
-    pthread_t producer_threads[NUM_PRODUCERS];
-    pthread_t consumer_threads[NUM_CONSUMERS];
+    //create threads
+    pthread_t producer_thread[numProducers];
+    pthread_t consumer_thread[numConsumers];
 
+    //Initialization of semaphore
     sem_init(&empty, 0, BUFFER_SIZE);
     sem_init(&full, 0, 0);
-    pthread_mutex_init(&mutex, NULL);
+    sem_init(&mutex, 0, 1);
 
-    int producer_ids[NUM_PRODUCERS];
-    int consumer_ids[NUM_CONSUMERS];
+    //producer and consumer id's
+    int producer_ids[numProducers];
+    int consumer_ids[numConsumers];
 
-    for (int i = 0; i < NUM_PRODUCERS; i++) {
-        producer_ids[i] = i + 1;
-        pthread_create(&producer_threads[i], NULL, producer, &producer_ids[i]);
+    //pthread create for producers
+    for(int i=0;i<numProducers;i++){
+        producer_ids[i] = i+1;
+        pthread_create(&producer_thread[i], NULL, producer, &producer_ids[i]);
     }
 
-    for (int i = 0; i < NUM_CONSUMERS; i++) {
-        consumer_ids[i] = i + 1;
-        pthread_create(&consumer_threads[i], NULL, consumer, &consumer_ids[i]);
+    //pthread create for consumers
+    for(int i=0;i<numConsumers;i++){
+        consumer_ids[i] = i+1;
+        pthread_create(&consumer_thread[i], NULL, consumer, &consumer_ids[i]);
     }
 
-    for (int i = 0; i < NUM_PRODUCERS; i++) {
-        pthread_join(producer_threads[i], NULL);
+    //pthread join for producers
+    for(int i=0;i<numProducers;i++){
+        pthread_join(producer_thread[i], NULL);
     }
 
-    for (int i = 0; i < NUM_CONSUMERS; i++) {
-        pthread_join(consumer_threads[i], NULL);
+    //pthread join for consumers
+    for(int i=0;i<numConsumers;i++){
+        pthread_join(consumer_thread[i], NULL);
     }
 
+    //destroy the semaphores
     sem_destroy(&empty);
     sem_destroy(&full);
-    pthread_mutex_destroy(&mutex);
-    
+    sem_destroy(&mutex);
+
     return 0;
 }

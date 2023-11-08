@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <unistd.h>
 
 void *writer_thr(void *temp);
 void *reader_thr(void *temp);
@@ -24,17 +24,14 @@ void *writer_thr(void *temp) {
         printf("writeSemaphore is locked by readers.\n");
     } else {
         printf("writeSemaphore is unlocked.\n");
+        sem_wait(&writeSemaphore);
+        printf("Writer %d is writing...\n", id);
+        // sleep(3);
+        sem_post(&writeSemaphore);
+        printf("Writer %d leaving the critical section.\n", id);
+        // Increment the writer count
+        writer_count++;
     }
-
-    sem_wait(&writeSemaphore);
-    printf("Writer %d is writing...\n", id);
-    // sleep(3);
-    sem_post(&writeSemaphore);
-    printf("Writer %d leaving the critical section.\n", id);
-
-    // Increment the writer count
-    writer_count++;
-
     pthread_exit(NULL);
 }
 
@@ -72,12 +69,12 @@ int main() {
     long int i;
     sem_init(&mutex, 0, 1);
     sem_init(&writeSemaphore, 0, 1);
-    pthread_t reader[100], writer[100];
 
     printf("\nEnter number of readers: ");
     scanf("%d", &r);
     printf("\nEnter number of writers: ");
     scanf("%d", &w);
+    pthread_t reader[r], writer[w];
 
     for (i = 1; i <= r; i++) {
         int *reader_id = malloc(sizeof(int));
