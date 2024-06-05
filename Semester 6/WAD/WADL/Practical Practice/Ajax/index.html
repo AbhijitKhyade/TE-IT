@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ajax Assignment</title>
+  </head>
+  <body>
+    <h2>Registration</h2>
+    <form id="form">
+      <label for="name">Name</label><br />
+      <input type="text" name="name" id="name" /><br />
+      <label for="email">Email</label><br />
+      <input type="email" name="email" id="email" /><br />
+      <button type="submit">Register</button>
+    </form>
+    <a href="user.html">Users</a>
+
+    <script>
+      let form = document.getElementById("form");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let name = document.getElementById("name").value;
+        let email = document.getElementById("email").value;
+
+        let formData = {
+          name,
+          email,
+        };
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:8080/register", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            alert("User Registered Successfully");
+            window.location.href = user.html;
+          } else {
+            console.log("Error:", xhr.responseText);
+          }
+        };
+        xhr.send(JSON.stringify({ name, email }));
+      });
+    </script>
+  </body>
+</html>

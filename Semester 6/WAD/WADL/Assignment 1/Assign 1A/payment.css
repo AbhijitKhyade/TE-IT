@@ -1,0 +1,39 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text {
+    text-align: center;
+    margin: 20px;
+}
+
+
+.row {
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.panel-title {
+    font-weight: bold;
+}
+
+.pl-ziro {
+    padding-left: 0px;
+}
+
+.cv {
+    margin-top: 16px;
+}

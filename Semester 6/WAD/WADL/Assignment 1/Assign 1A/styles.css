@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.header {
+    width: 100%;
+    background-color: rgb(174, 174, 174);
+}
+
+.image {
+    margin-top: -1px;
+}
+
+.img {
+    width: 100%;
+    height: 80vh;
+}
+.links{
+    color: red;
+}
+
+
+.cards {
+    margin: 25px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.card {
+    height: 50px;
+    margin: 7px;
+    border-radius: 5px;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    /* text-align: center; */
+    text-align: justify;
+}
+
+.cart-btn {
+    text-decoration: none;
+    border: 1px solid black;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 600;
+    color: black;
+    transition: 0.3s all;
+}
+
+.cart-btn:hover {
+    background-color: black;
+    color: white;
+
+}
+
+.cart {
+    cursor: pointer;
+}
+
+.login-btn {
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: transparent;
+    padding: 8px;
+
+}
+
+.login-btn a {
+    color: black;
+}
+
+.login-btn:hover {
+    background-color: black;
+}
+
+.login-btn a:hover {
+    color: white;
+}
+
+.media {
+    border: 1px solid black;
+    border-radius: 50%;
+}
+
+
+.custom-tooltip {
+    --bs-tooltip-bg: var(--bd-black-bg);
+    --bs-tooltip-color: var(--bs-white);
+}

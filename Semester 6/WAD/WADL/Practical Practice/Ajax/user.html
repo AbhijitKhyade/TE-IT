@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Data</title>
+  </head>
+  <body>
+    <h2>User Data</h2>
+    <ul id="userDataList"></ul>
+
+    <script>
+      window.onload = function () {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://localhost:8080/users", true);
+        xhr.send();
+        // console.log(xhr);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            let users = JSON.parse(xhr.responseText);
+            // console.log(users);
+            let userDataList = document.getElementById("userDataList");
+            users.map((user) => {
+              let li = document.createElement("li");
+              li.textContent = "Name: " + user.name + ", Email: " + user.email;
+              userDataList.appendChild(li);
+            });
+          } else {
+            console.error("Error:", xhr.responseText);
+          }
+        };
+      };
+    </script>
+  </body>
+</html>
